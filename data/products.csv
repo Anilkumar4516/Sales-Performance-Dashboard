@@ -1,0 +1,22 @@
+ProductID,ProductName,Category,Cost
+PROD-001,Laptop Pro 15,Technology,750.00
+PROD-002,Wireless Mouse,Technology,12.00
+PROD-003,Mechanical Keyboard,Technology,45.00
+PROD-004,27-inch 4K Monitor,Technology,210.00
+PROD-005,USB-C Multiport Hub,Technology,18.00
+PROD-006,Noise-Canceling Headphones,Technology,95.00
+PROD-007,HD Pro Webcam,Technology,35.00
+PROD-008,Ergonomic Office Chair,Furniture,140.00
+PROD-009,Electric Standing Desk,Furniture,280.00
+PROD-010,LED Desk Lamp,Furniture,16.00
+PROD-011,5-Shelf Bookcase,Furniture,65.00
+PROD-012,3-Drawer Filing Cabinet,Furniture,75.00
+PROD-013,Multipurpose Copy Paper,Office Supplies,4.50
+PROD-014,Gel Pen Pack (12-ct),Office Supplies,5.00
+PROD-015,Heavy-Duty Desk Stapler,Office Supplies,8.00
+PROD-016,Adhesive Sticky Notes (6-pk),Office Supplies,2.50
+PROD-017,Heavy-Duty 3-Ring Binder,Office Supplies,4.00
+PROD-018,Ergonomic Mouse Pad,Office Supplies,6.00
+PROD-002,Wireless Mouse,Technology,12.00
+PROD-019,Cable Management Sleeve,Office Supplies ,7.50
+

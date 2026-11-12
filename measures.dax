@@ -1,0 +1,85 @@
+/* ============================================================================
+   POWER BI SALES PERFORMANCE DASHBOARD - DAX MEASURES
+   ============================================================================
+   
+   HOW TO ADD THESE MEASURES IN POWER BI:
+   1. (Recommended Best Practice) In the Home tab, click "Enter Data".
+      Name the table "_Measures" and click "Load". This creates a dedicated folder 
+      for all your metrics so they stay organized in one place.
+   2. Right-click "_Measures" (or the sales table) in the Data pane > click "New Measure".
+   3. Copy and paste each formula below into the formula bar and press Enter.
+   4. Set the formatting (Currency $, Percentage %, or Whole Number) in the Measure Tools tab.
+   ============================================================================ */
+
+
+// 1. Total Sales
+// Explanation: Calculates total net revenue by multiplying quantity by unit price and deducting discounts for every sale.
+Total Sales = 
+SUMX(
+    sales,
+    sales[Quantity] * sales[UnitPrice] * (1 - sales[Discount])
+)
+// Formatting: Format as Currency ($) with 0 decimal places (e.g., $184,250).
+
+
+// Helper Measure: Total Cost
+// Explanation: Calculates total cost of goods sold by multiplying order quantity by product cost from the products table.
+Total Cost = 
+SUMX(
+    sales,
+    sales[Quantity] * RELATED(products[Cost])
+)
+// Formatting: Format as Currency ($) with 0 decimal places.
+
+
+// 2. Total Profit
+// Explanation: Calculates business earnings by subtracting total product costs from total net sales revenue.
+Total Profit = 
+[Total Sales] - [Total Cost]
+// Formatting: Format as Currency ($) with 0 decimal places.
+
+
+// 3. Profit Margin %
+// Explanation: The percentage of revenue retained as profit, safely handling zero sales without division errors.
+Profit Margin % = 
+DIVIDE([Total Profit], [Total Sales], 0)
+// Formatting: Format as Percentage (%) with 1 decimal place (e.g., 28.4%).
+
+
+// 4. Total Orders
+// Explanation: Counts the total number of distinct, unique sales transactions recorded.
+Total Orders = 
+DISTINCTCOUNT(sales[OrderID])
+// Formatting: Format as Whole Number with thousand separator (e.g., 1,000).
+
+
+// 5. Average Order Value
+// Explanation: The average dollar amount generated per customer order.
+Average Order Value = 
+DIVIDE([Total Sales], [Total Orders], 0)
+// Formatting: Format as Currency ($) with 2 decimal places (e.g., $184.25).
+
+
+// 6. Sales YoY % (Year-over-Year Growth)
+// Explanation: The percentage growth or decline in sales compared to the exact same calendar period in the previous year.
+Sales YoY % = 
+VAR CurrentSales = [Total Sales]
+VAR PriorYearSales = 
+    CALCULATE(
+        [Total Sales], 
+        SAMEPERIODLASTYEAR('DateTable'[Date])
+    )
+RETURN
+    DIVIDE(CurrentSales - PriorYearSales, PriorYearSales, 0)
+// Formatting: Format as Percentage (%) with 1 decimal place (e.g., +12.3%).
+
+
+// 7. Sales Last Month
+// Explanation: Calculates total sales for the calendar month immediately preceding the active date filter.
+Sales Last Month = 
+CALCULATE(
+    [Total Sales], 
+    PREVIOUSMONTH('DateTable'[Date])
+)
+// Formatting: Format as Currency ($) with 0 decimal places.
+

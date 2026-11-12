@@ -1,0 +1,14 @@
+# Temporary test files
+test.txt
+data/test.txt
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Temporary Power BI files
+*.tmp
+*.bak
+~$*

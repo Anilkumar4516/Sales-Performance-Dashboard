@@ -1,0 +1,45 @@
+CustomerID,CustomerName,City,Region
+CUST-1001,Emma Watson,New York,East
+CUST-1002,Liam Smith,Boston,East
+CUST-1003,Olivia Johnson,Philadelphia,East
+CUST-1004,Noah Williams,New York,East
+CUST-1005,Sophia Brown,Boston,East
+CUST-1006,Luc as Jones,Philadelphia,East
+CUST-1007,Ava Garcia,Newark,East
+CUST-1008,Mason Miller,Buffalo,East
+CUST-1009,Isabella Davis,Pittsburgh,East
+CUST-1010,Ethan Rodriguez,Hartford,East
+CUST-1011,Mia Martinez,Los Angeles,West
+CUST-1012,James Hernandez,San Francisco,West
+CUST-1013,Harper Lopez,Seattle,West
+CUST-1014,Alexander Gonzalez,San Diego,West
+CUST-1015,Evelyn Wilson,Denver,West
+CUST-1016,Benjamin Anderson,Portland,West
+CUST-1017,Charlotte Thomas,Phoenix,West
+CUST-1018,Elijah Taylor,Las Vegas,West
+CUST-1019,Amelia Moore,San Jose,West
+CUST-1020,Daniel Jackson,Salt Lake City,West
+CUST-1021,Emily Martin,Chicago,North
+CUST-1022,Henry Lee,Minneapolis,North
+CUST-1023,Ella Perez,Detroit,North
+CUST-1024,Jackson White,Milwaukee,North
+CUST-1025,Avery Harris,Cleveland,North
+CUST-1026,Sebastian Clark,Columbus,North
+CUST-1027,Scarlett Lewis,Indianapolis,North
+CUST-1028,Matthew Robinson,Des Moines,North
+CUST-1029,Chloe Walker,Kansas City,North
+CUST-1030,David Young,Omaha,North
+CUST-1031,Grace Allen,Dallas,South
+CUST-1032,Carter King,Houston,South
+CUST-1033,Zoey Wright,Atlanta,South
+CUST-1034,Wyatt Scott,Miami,South
+CUST-1035,Penelope Torres,Austin,South
+CUST-1036,Julian Nguyen,Orlando,South
+CUST-1037,Riley Hill,Nashville,South
+CUST-1038,Leo Flores,Charlotte,South
+CUST-1039,Layla Green,Tampa,South
+CUST-1040,Gabriel Adams,New Orleans,South
+CUST-1005,Sophia Brown,Boston,East
+CUST-1031,Grace Allen,Dallas,South
+CUST-1041,Hannah Baker,Raleigh,
+CUST-1042,  Victor Vance  ,Memphis,South
