@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Power BI - Sales Performance Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --pbi-canvas-bg: #F0F2F6;
+      --pbi-card-bg: #FFFFFF;
+      --pbi-card-border: #E1E3E6;
+      --pbi-text-title: #252423;
+      --pbi-text-body: #323130;
+      --pbi-text-muted: #605E5C;
+      --pbi-blue: #118DFF;
+      --pbi-navy: #12239E;
+      --pbi-green: #107C41;
+      --pbi-gold: #F2C811;
+      --pbi-purple: #6B69D6;
+      --pbi-red: #D83B01;
+      --pbi-hover: #F3F2F1;
+    }
+
+    body {
+      background-color: var(--pbi-canvas-bg);
+      color: var(--pbi-text-body);
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .pbi-card {
+      background-color: var(--pbi-card-bg);
+      border: 1px solid var(--pbi-card-border);
+      border-radius: 6px;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .pbi-card:hover {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+    }
+
+    .pbi-slicer-btn {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 4px;
+      border: 1px solid #D1D5DB;
+      background-color: #FFFFFF;
+      color: #323130;
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+    }
+
+    .pbi-slicer-btn:hover {
+      background-color: var(--pbi-hover);
+      border-color: var(--pbi-blue);
+    }
+
+    .pbi-slicer-btn.active {
+      background-color: var(--pbi-blue);
+      border-color: var(--pbi-blue);
+      color: #FFFFFF;
+      box-shadow: 0 2px 4px rgba(17, 141, 255, 0.3);
+    }
+
+    @keyframes live-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.15); }
+    }
+    .live-dot {
+      animation: live-pulse 2s infinite ease-in-out;
+    }
+
+    .pbi-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .pbi-scrollbar::-webkit-scrollbar-thumb {
+      background: #C8C6C4;
+      border-radius: 3px;
+    }
+    .pbi-scrollbar::-webkit-scrollbar-track {
+      background: #F3F2F1;
+    }
+  </style>
+</head>
+<body class="min-h-screen p-3 md:p-5 antialiased">
+  
+  <div class="max-w-7xl mx-auto space-y-4">
+
+    <!-- POWER BI APP HEADER & LIVE STATUS BAR -->
+    <header class="pbi-card p-3.5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 bg-white">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded bg-[#F2C811] flex items-center justify-center shadow-sm">
+          <svg class="w-5 h-5 text-black" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M4 11h3v10H4zm6-6h3v16h-3zm6 4h3v12h-3z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg md:text-xl font-bold tracking-tight text-[#252423]">Sales Performance Dashboard</h1>
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-xs">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 live-dot"></span>
+              LIVE DATA STREAM
+            </span>
+          </div>
+          <p class="text-xs text-[#605E5C] mt-0.5">
+            Executive Summary • FY 2025 - 2026 - 2027 • Real-Time Model
+          </p>
+        </div>
+      </div>
+
+      <!-- SLICERS & REFRESH CONTROLS -->
+      <div class="flex flex-wrap items-center gap-2.5">
+        <!-- Year Slicer (2025, 2026, 2027) -->
+        <div class="flex items-center gap-1 bg-[#F3F2F1] p-1 rounded border border-[#EDEBE9]">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-[#605E5C] px-1.5">Year:</span>
+          <button class="pbi-slicer-btn active" data-filter="year" data-value="all">All</button>
+          <button class="pbi-slicer-btn" data-filter="year" data-value="2025">2025</button>
+          <button class="pbi-slicer-btn" data-filter="year" data-value="2026">2026</button>
+          <button class="pbi-slicer-btn" data-filter="year" data-value="2027">2027</button>
+        </div>
+
+        <!-- Category Slicer -->
+        <div class="flex items-center gap-1 bg-[#F3F2F1] p-1 rounded border border-[#EDEBE9]">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-[#605E5C] px-1.5">Category:</span>
+          <select id="catSelect" class="bg-white text-xs text-[#252423] font-medium border border-[#D1D5DB] rounded px-2 py-1 outline-none focus:border-[#118DFF] cursor-pointer">
+            <option value="all">All Categories</option>
+            <option value="Technology">Technology</option>
+            <option value="Furniture">Furniture</option>
+            <option value="Office Supplies">Office Supplies</option>
+          </select>
+        </div>
+
+        <!-- Region Slicer -->
+        <div class="flex items-center gap-1 bg-[#F3F2F1] p-1 rounded border border-[#EDEBE9]">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-[#605E5C] px-1.5">Region:</span>
+          <select id="regionSelect" class="bg-white text-xs text-[#252423] font-medium border border-[#D1D5DB] rounded px-2 py-1 outline-none focus:border-[#118DFF] cursor-pointer">
+            <option value="all">All Regions</option>
+            <option value="East">East</option>
+            <option value="West">West</option>
+            <option value="North">North</option>
+            <option value="South">South</option>
+          </select>
+        </div>
+
+        <!-- Manual Refresh Button -->
+        <button id="refreshBtn" title="Simulate real-time data refresh" class="flex items-center gap-1 text-xs px-2.5 py-1.5 bg-[#FFFFFF] hover:bg-[#F3F2F1] text-[#252423] font-semibold border border-[#D1D5DB] rounded shadow-2xs transition-colors cursor-pointer">
+          <svg id="refreshIcon" class="w-3.5 h-3.5 text-[#118DFF] transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          <span id="refreshLabel">Refresh</span>
+        </button>
+
+        <!-- Reset Button -->
+        <button id="resetFilters" class="text-xs px-2.5 py-1.5 text-[#605E5C] hover:text-[#252423] hover:bg-[#F3F2F1] border border-dashed border-[#D1D5DB] rounded transition-colors cursor-pointer">
+          Reset
+        </button>
+      </div>
+    </header>
+
+    <!-- REAL-TIME SUB-HEADER BANNER -->
+    <div class="flex items-center justify-between text-xs text-[#605E5C] px-1">
+      <div class="flex items-center gap-2">
+        <span class="inline-block w-2 h-2 rounded-full bg-[#107C41]"></span>
+        <span id="lastRefreshedText">Last refreshed: Today, 5:32 PM • Next refresh in <span id="countdownText" class="font-bold text-[#118DFF]">14s</span></span>
+      </div>
+      <div class="text-[11px] font-medium hidden sm:block">
+        Showing <strong>36 Months</strong> of sales history & forecasts (Jan 2025 – Dec 2027)
+      </div>
+    </div>
+
+    <!-- 4 TOP KPI CARDS (AUTHENTIC POWER BI LOOK) -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+      
+      <!-- KPI 1: Total Sales -->
+      <div class="pbi-card p-4 relative overflow-hidden bg-white border-l-4 border-l-[#118DFF]">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-[#605E5C] uppercase tracking-wider">Total Sales</span>
+          <span id="kpiSalesYoY" class="text-[11px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-[#118DFF] border border-blue-100">+15.8% YoY</span>
+        </div>
+        <div class="mt-2">
+          <div class="text-2xl sm:text-3xl font-extrabold text-[#252423] tracking-tight tabular-nums" id="kpiSales">$314,850</div>
+          <div class="text-[11px] text-[#605E5C] mt-0.5">Net revenue after discounts</div>
+        </div>
+        <div class="w-full bg-[#F3F2F1] h-1.5 rounded-full mt-3 overflow-hidden">
+          <div id="kpiSalesBar" class="bg-[#118DFF] h-full w-[84%] transition-all duration-500"></div>
+        </div>
+      </div>
+
+      <!-- KPI 2: Total Profit -->
+      <div class="pbi-card p-4 relative overflow-hidden bg-white border-l-4 border-l-[#107C41]">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-[#605E5C] uppercase tracking-wider">Total Profit</span>
+          <span id="kpiProfitYoY" class="text-[11px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-[#107C41] border border-emerald-100">+18.2% YoY</span>
+        </div>
+        <div class="mt-2">
+          <div class="text-2xl sm:text-3xl font-extrabold text-[#107C41] tracking-tight tabular-nums" id="kpiProfit">$92,410</div>
+          <div class="text-[11px] text-[#605E5C] mt-0.5">Gross operating margin</div>
+        </div>
+        <div class="w-full bg-[#F3F2F1] h-1.5 rounded-full mt-3 overflow-hidden">
+          <div id="kpiProfitBar" class="bg-[#107C41] h-full w-[72%] transition-all duration-500"></div>
+        </div>
+      </div>
+
+      <!-- KPI 3: Profit Margin % -->
+      <div class="pbi-card p-4 relative overflow-hidden bg-white border-l-4 border-l-[#6B69D6]">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-[#605E5C] uppercase tracking-wider">Profit Margin %</span>
+          <span class="text-[11px] font-bold px-1.5 py-0.5 rounded bg-purple-50 text-[#6B69D6] border border-purple-100">Target: 25.0%</span>
+        </div>
+        <div class="mt-2">
+          <div class="text-2xl sm:text-3xl font-extrabold text-[#252423] tracking-tight tabular-nums" id="kpiMargin">29.4%</div>
+          <div class="text-[11px] text-[#605E5C] mt-0.5">+4.4% pts above annual plan</div>
+        </div>
+        <div class="w-full bg-[#F3F2F1] h-1.5 rounded-full mt-3 overflow-hidden">
+          <div id="kpiMarginBar" class="bg-[#6B69D6] h-full w-[88%] transition-all duration-500"></div>
+        </div>
+      </div>
+
+      <!-- KPI 4: Total Orders -->
+      <div class="pbi-card p-4 relative overflow-hidden bg-white border-l-4 border-l-[#F2C811]">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-[#605E5C] uppercase tracking-wider">Total Orders</span>
+          <span id="kpiAOV" class="text-[11px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">AOV: $199.27</span>
+        </div>
+        <div class="mt-2">
+          <div class="text-2xl sm:text-3xl font-extrabold text-[#252423] tracking-tight tabular-nums" id="kpiOrders">1,580</div>
+          <div class="text-[11px] text-[#605E5C] mt-0.5">Completed customer checkouts</div>
+        </div>
+        <div class="w-full bg-[#F3F2F1] h-1.5 rounded-full mt-3 overflow-hidden">
+          <div id="kpiOrdersBar" class="bg-[#F2C811] h-full w-[94%] transition-all duration-500"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- MIDDLE ROW: LINE CHART (3-YEAR MONTHLY TREND) & TOP 10 PRODUCTS -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      
+      <!-- Line Chart: 2025 to 2027 Monthly Trend (7 Cols) -->
+      <div class="pbi-card p-4 lg:col-span-7 flex flex-col bg-white">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h2 class="text-sm font-bold text-[#252423]">Monthly Sales Trend (FY 2025 - 2027)</h2>
+            <p class="text-xs text-[#605E5C]">Continuous 36-month timeline showing actuals and run-rate growth</p>
+          </div>
+          <div class="flex items-center gap-3 text-xs font-semibold">
+            <span class="flex items-center gap-1.5 text-[#252423]">
+              <span class="w-3.5 h-1 bg-[#118DFF] rounded-full inline-block"></span> Sales
+            </span>
+            <span class="flex items-center gap-1.5 text-[#107C41]">
+              <span class="w-3.5 h-1 bg-[#107C41] rounded-full inline-block"></span> Profit
+            </span>
+          </div>
+        </div>
+
+        <!-- SVG Line Chart Canvas -->
+        <div class="relative w-full h-64 mt-1 bg-[#FAFAFA] rounded border border-[#EDEBE9] p-2">
+          <svg id="trendSvg" class="w-full h-full overflow-visible" viewBox="0 0 700 230" preserveAspectRatio="none">
+            <!-- Grid lines and trend injected via JS -->
+          </svg>
+          <div id="chartTooltip" class="absolute pointer-events-none hidden bg-[#FFFFFF] text-[#252423] text-xs px-3 py-2 rounded shadow-lg border border-[#D1D5DB] z-10 space-y-0.5">
+          </div>
+        </div>
+
+        <!-- Timeline Axis Labels -->
+        <div class="flex justify-between text-[10px] font-semibold text-[#605E5C] px-3 pt-2 mt-1">
+          <span>Jan 2025</span>
+          <span>Jul 2025</span>
+          <span>Jan 2026</span>
+          <span>Jul 2026</span>
+          <span>Jan 2027</span>
+          <span>Dec 2027</span>
+        </div>
+      </div>
+
+      <!-- Bar Chart: Top 10 Products (5 Cols) -->
+      <div class="pbi-card p-4 lg:col-span-5 flex flex-col bg-white">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h2 class="text-sm font-bold text-[#252423]">Top 10 Products by Sales</h2>
+            <p class="text-xs text-[#605E5C]">Ranked by total net revenue contribution</p>
+          </div>
+          <span class="text-[10px] uppercase font-bold text-[#118DFF] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Top 10</span>
+        </div>
+        <div id="topProductsList" class="space-y-2 overflow-y-auto max-h-64 pr-1 pbi-scrollbar text-xs">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- BOTTOM ROW: REGIONAL BREAKDOWN & CATEGORY SUMMARY MATRIX -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      
+      <!-- Regional Performance (5 Cols) -->
+      <div class="pbi-card p-4 lg:col-span-5 flex flex-col bg-white">
+        <div class="mb-3">
+          <h2 class="text-sm font-bold text-[#252423]">Sales by Region</h2>
+          <p class="text-xs text-[#605E5C]">Regional sales revenue and gross profit share</p>
+        </div>
+        <div id="regionChartContainer" class="space-y-3.5 my-auto">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Category Performance Summary (7 Cols) -->
+      <div class="pbi-card p-4 lg:col-span-7 flex flex-col bg-white">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h2 class="text-sm font-bold text-[#252423]">Category Performance Matrix</h2>
+            <p class="text-xs text-[#605E5C]">Net sales, gross profit, margin %, and order count</p>
+          </div>
+          <span class="text-[11px] font-semibold text-[#605E5C]">3 Business Lines</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border border-[#EDEBE9] rounded">
+            <thead>
+              <tr class="bg-[#F3F2F1] text-[#252423] font-bold border-b border-[#EDEBE9]">
+                <th class="py-2.5 px-3">Category</th>
+                <th class="py-2.5 px-3 text-right">Sales</th>
+                <th class="py-2.5 px-3 text-right">Profit</th>
+                <th class="py-2.5 px-3 text-right">Margin %</th>
+                <th class="py-2.5 px-3 text-right">Orders</th>
+                <th class="py-2.5 px-3 text-center">Share</th>
+              </tr>
+            </thead>
+            <tbody id="categoryTableBody" class="divide-y divide-[#EDEBE9]">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- FOOTER BAR -->
+    <footer class="pbi-card p-3 flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#605E5C] bg-white gap-2">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-[#107C41]"></span>
+        <span>Model: <strong>Star Schema</strong> (<code>sales</code>, <code>products</code>, <code>customers</code>, <code>DateTable</code>)</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <span>Timeframe: <strong>FY 2025 – 2027</strong></span>
+        <span>Mode: <strong>DirectQuery / Real-Time Simulation</strong></span>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- REAL-TIME INTERACTIVE SCRIPT ENGINE -->
+  <script>
+    const monthlyData = [
+      { month: "Jan 25", year: 2025, sales: 7450, profit: 2150 },
+      { month: "Feb 25", year: 2025, sales: 7850, profit: 2280 },
+      { month: "Mar 25", year: 2025, sales: 8650, profit: 2520 },
+      { month: "Apr 25", year: 2025, sales: 8150, profit: 2360 },
+      { month: "May 25", year: 2025, sales: 8950, profit: 2610 },
+      { month: "Jun 25", year: 2025, sales: 9400, profit: 2750 },
+      { month: "Jul 25", year: 2025, sales: 9150, profit: 2670 },
+      { month: "Aug 25", year: 2025, sales: 9700, profit: 2840 },
+      { month: "Sep 25", year: 2025, sales: 9950, profit: 2910 },
+      { month: "Oct 25", year: 2025, sales: 10400, profit: 3050 },
+      { month: "Nov 25", year: 2025, sales: 13200, profit: 3850 },
+      { month: "Dec 25", year: 2025, sales: 14750, profit: 4280 },
+      { month: "Jan 26", year: 2026, sales: 8450, profit: 2470 },
+      { month: "Feb 26", year: 2026, sales: 8900, profit: 2610 },
+      { month: "Mar 26", year: 2026, sales: 9850, profit: 2890 },
+      { month: "Apr 26", year: 2026, sales: 9350, profit: 2740 },
+      { month: "May 26", year: 2026, sales: 10250, profit: 3010 },
+      { month: "Jun 26", year: 2026, sales: 10800, profit: 3180 },
+      { month: "Jul 26", year: 2026, sales: 10500, profit: 3080 },
+      { month: "Aug 26", year: 2026, sales: 11100, profit: 3270 },
+      { month: "Sep 26", year: 2026, sales: 11450, profit: 3380 },
+      { month: "Oct 26", year: 2026, sales: 11950, profit: 3520 },
+      { month: "Nov 26", year: 2026, sales: 15200, profit: 4420 },
+      { month: "Dec 26", year: 2026, sales: 16900, profit: 4890 },
+      { month: "Jan 27", year: 2027, sales: 9650, profit: 2830 },
+      { month: "Feb 27", year: 2027, sales: 10150, profit: 2980 },
+      { month: "Mar 27", year: 2027, sales: 11200, profit: 3290 },
+      { month: "Apr 27", year: 2027, sales: 10650, profit: 3120 },
+      { month: "May 27", year: 2027, sales: 11700, profit: 3440 },
+      { month: "Jun 27", year: 2027, sales: 12350, profit: 3630 },
+      { month: "Jul 27", year: 2027, sales: 12000, profit: 3520 },
+      { month: "Aug 27", year: 2027, sales: 12700, profit: 3740 },
+      { month: "Sep 27", year: 2027, sales: 13100, profit: 3860 },
+      { month: "Oct 27", year: 2027, sales: 13650, profit: 4020 },
+      { month: "Nov 27", year: 2027, sales: 17350, profit: 5050 },
+      { month: "Dec 27", year: 2027, sales: 19300, profit: 5580 }
+    ];
+
+    const products = [
+      { name: "Laptop Pro 15", cat: "Technology", sales: 101500, profit: 29000 },
+      { name: "27-inch 4K Monitor", cat: "Technology", sales: 46200, profit: 15900 },
+      { name: "Electric Standing Desk", cat: "Furniture", sales: 39600, profit: 16500 },
+      { name: "Ergonomic Office Chair", cat: "Furniture", sales: 36150, profit: 15100 },
+      { name: "Noise-Canceling Headphones", cat: "Technology", sales: 22950, profit: 10120 },
+      { name: "Mechanical Keyboard", cat: "Technology", sales: 13950, profit: 6110 },
+      { name: "5-Shelf Bookcase", cat: "Furniture", sales: 11400, profit: 5230 },
+      { name: "3-Drawer Filing Cabinet", cat: "Furniture", sales: 10700, profit: 4760 },
+      { name: "HD Pro Webcam", cat: "Technology", sales: 10300, profit: 4760 },
+      { name: "USB-C Multiport Hub", cat: "Technology", sales: 7780, profit: 3780 },
+      { name: "LED Desk Lamp", cat: "Furniture", sales: 5750, profit: 2970 },
+      { name: "Wireless Mouse", cat: "Technology", sales: 5550, profit: 2890 },
+      { name: "Multipurpose Copy Paper", cat: "Office Supplies", sales: 4520, profit: 2380 },
+      { name: "Gel Pen Pack (12-ct)", cat: "Office Supplies", sales: 2850, profit: 1660 },
+      { name: "Heavy-Duty Desk Stapler", cat: "Office Supplies", sales: 2280, profit: 1270 }
+    ];
+
+    const regions = [
+      { name: "East", sales: 97600, profit: 28650 },
+      { name: "West", sales: 84900, profit: 24950 },
+      { name: "North", sales: 72400, profit: 21250 },
+      { name: "South", sales: 59950, profit: 17560 }
+    ];
+
+    let currentYear = "all";
+    let currentCategory = "all";
+    let currentRegion = "all";
+    let liveTick = 0;
+
+    function updateDashboard() {
+      let yearFactor = 1.0;
+      if (currentYear === "2025") yearFactor = 0.28;
+      else if (currentYear === "2026") yearFactor = 0.33;
+      else if (currentYear === "2027") yearFactor = 0.39;
+
+      let catFactor = 1.0;
+      if (currentCategory === "Technology") catFactor = 0.65;
+      else if (currentCategory === "Furniture") catFactor = 0.28;
+      else if (currentCategory === "Office Supplies") catFactor = 0.07;
+
+      let regFactor = 1.0;
+      if (currentRegion === "East") regFactor = 0.31;
+      else if (currentRegion === "West") regFactor = 0.27;
+      else if (currentRegion === "North") regFactor = 0.23;
+      else if (currentRegion === "South") regFactor = 0.19;
+
+      const totalFactor = yearFactor * (currentCategory === "all" ? 1 : catFactor) * (currentRegion === "all" ? 1 : regFactor);
+
+      const baseSales = (314850 + liveTick * 45) * totalFactor;
+      const baseProfit = (92410 + liveTick * 14) * totalFactor;
+      const baseOrders = Math.max(1, Math.round((1580 + liveTick) * totalFactor));
+      const margin = (baseProfit / baseSales) * 100;
+      const aov = baseSales / baseOrders;
+
+      document.getElementById("kpiSales").innerText = "$" + Math.round(baseSales).toLocaleString();
+      document.getElementById("kpiProfit").innerText = "$" + Math.round(baseProfit).toLocaleString();
+      document.getElementById("kpiMargin").innerText = margin.toFixed(1) + "%";
+      document.getElementById("kpiOrders").innerText = baseOrders.toLocaleString();
+      document.getElementById("kpiAOV").innerText = "AOV: $" + aov.toFixed(2);
+
+      renderLineChart();
+      renderTopProducts(totalFactor);
+      renderRegions(totalFactor);
+      renderCategoryTable(yearFactor, regFactor);
+    }
+
+    function renderLineChart() {
+      const svg = document.getElementById("trendSvg");
+      svg.innerHTML = "";
+
+      let points = monthlyData;
+      if (currentYear === "2025") points = points.filter(d => d.year === 2025);
+      if (currentYear === "2026") points = points.filter(d => d.year === 2026);
+      if (currentYear === "2027") points = points.filter(d => d.year === 2027);
+
+      const maxSales = Math.max(...points.map(d => d.sales)) * 1.15;
+      const width = 700;
+      const height = 230;
+      const padX = 20;
+      const padY = 20;
+
+      for (let i = 0; i <= 4; i++) {
+        const y = height - padY - (i * (height - 2 * padY) / 4);
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", padX);
+        line.setAttribute("y1", y);
+        line.setAttribute("x2", width - padX);
+        line.setAttribute("y2", y);
+        line.setAttribute("stroke", "#EDEBE9");
+        line.setAttribute("stroke-width", "1");
+        svg.appendChild(line);
+      }
+
+      const stepX = (width - 2 * padX) / Math.max(1, points.length - 1);
+      let salesPathD = "";
+      let profitPathD = "";
+      let areaD = `M ${padX} ${height - padY}`;
+
+      const coords = [];
+
+      points.forEach((p, idx) => {
+        const x = padX + (idx * stepX);
+        const ySales = height - padY - ((p.sales / maxSales) * (height - 2 * padY));
+        const yProfit = height - padY - ((p.profit / maxSales) * (height - 2 * padY));
+
+        coords.push({ x, ySales, yProfit, d: p });
+
+        if (idx === 0) {
+          salesPathD += `M ${x} ${ySales}`;
+          profitPathD += `M ${x} ${yProfit}`;
+          areaD += ` L ${x} ${ySales}`;
+        } else {
+          salesPathD += ` L ${x} ${ySales}`;
+          profitPathD += ` L ${x} ${yProfit}`;
+          areaD += ` L ${x} ${ySales}`;
+        }
+      });
+
+      areaD += ` L ${padX + ((points.length - 1) * stepX)} ${height - padY} Z`;
+
+      const area = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      area.setAttribute("d", areaD);
+      area.setAttribute("fill", "#118DFF");
+      area.setAttribute("fill-opacity", "0.08");
+      svg.appendChild(area);
+
+      const pLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      pLine.setAttribute("d", profitPathD);
+      pLine.setAttribute("fill", "none");
+      pLine.setAttribute("stroke", "#107C41");
+      pLine.setAttribute("stroke-width", "2");
+      pLine.setAttribute("stroke-linecap", "round");
+      svg.appendChild(pLine);
+
+      const sLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      sLine.setAttribute("d", salesPathD);
+      sLine.setAttribute("fill", "none");
+      sLine.setAttribute("stroke", "#118DFF");
+      sLine.setAttribute("stroke-width", "2.5");
+      sLine.setAttribute("stroke-linecap", "round");
+      svg.appendChild(sLine);
+
+      const tooltip = document.getElementById("chartTooltip");
+      coords.forEach(pt => {
+        const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        dot.setAttribute("cx", pt.x);
+        dot.setAttribute("cy", pt.ySales);
+        dot.setAttribute("r", points.length > 20 ? "3" : "4.5");
+        dot.setAttribute("fill", "#118DFF");
+        dot.setAttribute("stroke", "#FFFFFF");
+        dot.setAttribute("stroke-width", "1.5");
+        dot.classList.add("cursor-pointer", "transition-all", "hover:scale-150");
+
+        dot.addEventListener("mouseenter", () => {
+          tooltip.innerHTML = `
+            <div class="font-bold text-[#118DFF] text-xs border-b border-[#EDEBE9] pb-1 mb-1">${pt.d.month}</div>
+            <div class="flex justify-between gap-3"><span>Sales:</span><strong class="text-[#252423]">$${pt.d.sales.toLocaleString()}</strong></div>
+            <div class="flex justify-between gap-3 text-[#107C41]"><span>Profit:</span><strong>$${pt.d.profit.toLocaleString()}</strong></div>
+          `;
+          tooltip.classList.remove("hidden");
+          const rect = svg.getBoundingClientRect();
+          const tipX = (pt.x / width) * rect.width;
+          tooltip.style.left = `${Math.min(rect.width - 130, Math.max(10, tipX - 60))}px`;
+          tooltip.style.top = `15px`;
+        });
+
+        dot.addEventListener("mouseleave", () => {
+          tooltip.classList.add("hidden");
+        });
+
+        svg.appendChild(dot);
+      });
+    }
+
+    function renderTopProducts(totalFactor) {
+      const container = document.getElementById("topProductsList");
+      container.innerHTML = "";
+
+      let filtered = products;
+      if (currentCategory !== "all") {
+        filtered = filtered.filter(p => p.cat === currentCategory);
+      }
+
+      const top10 = filtered.slice(0, 10);
+      const maxVal = top10.length > 0 ? (top10[0].sales * totalFactor) : 1;
+
+      top10.forEach((p, idx) => {
+        const sVal = Math.round(p.sales * totalFactor);
+        const pct = Math.round((sVal / maxVal) * 100);
+        const item = document.createElement("div");
+        item.className = "flex flex-col gap-1";
+        item.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="font-medium text-[#252423] truncate max-w-[210px] flex items-center gap-1.5">
+              <span class="text-[10px] text-[#605E5C] font-semibold w-4">${idx + 1}.</span>
+              ${p.name}
+            </span>
+            <span class="font-bold text-[#252423] tabular-nums">$${sVal.toLocaleString()}</span>
+          </div>
+          <div class="w-full bg-[#EDEBE9] h-2 rounded-full overflow-hidden flex">
+            <div class="bg-[#118DFF] h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function renderRegions(totalFactor) {
+      const container = document.getElementById("regionChartContainer");
+      container.innerHTML = "";
+
+      const maxRegionSales = 97600 * totalFactor;
+
+      regions.forEach(r => {
+        const isSelected = currentRegion === "all" || currentRegion === r.name;
+        const opacity = isSelected ? "opacity-100" : "opacity-35";
+        const rSales = Math.round(r.sales * totalFactor);
+        const rProfit = Math.round(r.profit * totalFactor);
+        const barWidth = Math.round((rSales / maxRegionSales) * 100);
+
+        const card = document.createElement("div");
+        card.className = `space-y-1 transition-opacity ${opacity}`;
+        card.innerHTML = `
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-[#252423] flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full ${r.name === 'East' ? 'bg-[#118DFF]' : r.name === 'West' ? 'bg-[#6B69D6]' : r.name === 'North' ? 'bg-[#107C41]' : 'bg-[#F2C811]'}"></span>
+              ${r.name} Region
+            </span>
+            <div class="space-x-2 tabular-nums">
+              <span class="font-bold text-[#252423]">$${rSales.toLocaleString()}</span>
+              <span class="text-[11px] text-[#107C41] font-semibold">($${rProfit.toLocaleString()} profit)</span>
+            </div>
+          </div>
+          <div class="w-full bg-[#EDEBE9] h-2.5 rounded-full overflow-hidden flex">
+            <div class="h-full rounded-full ${r.name === 'East' ? 'bg-[#118DFF]' : r.name === 'West' ? 'bg-[#6B69D6]' : r.name === 'North' ? 'bg-[#107C41]' : 'bg-[#F2C811]'} transition-all duration-300" style="width: ${barWidth}%"></div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderCategoryTable(yearFactor, regFactor) {
+      const tbody = document.getElementById("categoryTableBody");
+      tbody.innerHTML = "";
+
+      const baseCats = [
+        { name: "Technology", sales: 201500, profit: 61100, margin: 30.3, orders: 760, share: 64 },
+        { name: "Furniture", sales: 87900, profit: 26360, margin: 30.0, orders: 510, share: 28 },
+        { name: "Office Supplies", sales: 25450, profit: 4950, margin: 19.4, orders: 310, share: 8 }
+      ];
+
+      baseCats.forEach(c => {
+        const isHighlight = currentCategory === "all" || currentCategory === c.name;
+        const cFactor = yearFactor * regFactor;
+        const cSales = Math.round(c.sales * cFactor);
+        const cProfit = Math.round(c.profit * cFactor);
+        const cOrders = Math.round(c.orders * cFactor);
+
+        const tr = document.createElement("tr");
+        tr.className = `hover:bg-[#F3F2F1] transition-colors ${isHighlight ? '' : 'opacity-35'}`;
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-semibold text-[#252423] flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-sm ${c.name === 'Technology' ? 'bg-[#118DFF]' : c.name === 'Furniture' ? 'bg-[#6B69D6]' : 'bg-[#107C41]'}"></span>
+            ${c.name}
+          </td>
+          <td class="py-2.5 px-3 text-right font-bold tabular-nums text-[#252423]">$${cSales.toLocaleString()}</td>
+          <td class="py-2.5 px-3 text-right text-[#107C41] tabular-nums font-bold">$${cProfit.toLocaleString()}</td>
+          <td class="py-2.5 px-3 text-right font-bold tabular-nums text-[#252423]">${c.margin}%</td>
+          <td class="py-2.5 px-3 text-right text-[#605E5C] tabular-nums">${cOrders}</td>
+          <td class="py-2.5 px-3 text-center">
+            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-[#118DFF] border border-blue-100">${c.share}%</span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.querySelectorAll('[data-filter="year"]').forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll('[data-filter="year"]').forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentYear = btn.getAttribute("data-value");
+        updateDashboard();
+      });
+    });
+
+    document.getElementById("catSelect").addEventListener("change", (e) => {
+      currentCategory = e.target.value;
+      updateDashboard();
+    });
+
+    document.getElementById("regionSelect").addEventListener("change", (e) => {
+      currentRegion = e.target.value;
+      updateDashboard();
+    });
+
+    document.getElementById("resetFilters").addEventListener("click", () => {
+      currentYear = "all";
+      currentCategory = "all";
+      currentRegion = "all";
+
+      document.querySelectorAll('[data-filter="year"]').forEach(b => {
+        b.classList.remove("active");
+        if (b.getAttribute("data-value") === "all") b.classList.add("active");
+      });
+      document.getElementById("catSelect").value = "all";
+      document.getElementById("regionSelect").value = "all";
+
+      updateDashboard();
+    });
+
+    const refreshBtn = document.getElementById("refreshBtn");
+    const refreshIcon = document.getElementById("refreshIcon");
+    const refreshLabel = document.getElementById("refreshLabel");
+    
+    function triggerRefresh() {
+      refreshIcon.classList.add("rotate-180");
+      refreshLabel.innerText = "Refreshing...";
+      liveTick++;
+      setTimeout(() => {
+        refreshIcon.classList.remove("rotate-180");
+        refreshLabel.innerText = "Refresh";
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        document.getElementById("lastRefreshedText").innerHTML = `Last refreshed: Today, ${timeStr} • Next refresh in <span id="countdownText" class="font-bold text-[#118DFF]">15s</span>`;
+        updateDashboard();
+      }, 500);
+    }
+
+    refreshBtn.addEventListener("click", triggerRefresh);
+
+    let countdown = 15;
+    setInterval(() => {
+      countdown--;
+      const cdEl = document.getElementById("countdownText");
+      if (cdEl) cdEl.innerText = `${countdown}s`;
+      if (countdown <= 0) {
+        countdown = 15;
+        triggerRefresh();
+      }
+    }, 1000);
+
+    updateDashboard();
+  </script>
+</body>
+</html>

@@ -5,7 +5,20 @@ A comprehensive, end-to-end **Sales Performance Dashboard** tutorial and data mo
 ![Timeframe](https://img.shields.io/badge/Timeframe-FY%202025--2027-blue.svg)
 ![Tool](https://img.shields.io/badge/Platform-Power%20BI%20Desktop-F2C811.svg?logo=powerbi&logoColor=black)
 ![Architecture](https://img.shields.io/badge/Data%20Model-Star%20Schema-success.svg)
-![Status](https://img.shields.io/badge/Status-Completed-brightgreen.svg)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-View_Dashboard-00B4D8?style=for-the-badge&logo=google-chrome&logoColor=white)](https://anilkumar4516.github.io/Sales-Performance-Dashboard/)
+
+---
+
+## 🚀 Live Interactive Demo (For Team Meetings & Stakeholder Reviews)
+
+> 🔗 **Live Deployment Link:**  
+> ### 👉 **[https://anilkumar4516.github.io/Sales-Performance-Dashboard/](https://anilkumar4516.github.io/Sales-Performance-Dashboard/)**
+
+### 🎙️ How to Showcase This in Team Meetings:
+* **One-Click Browser Access**: Open the live link in any browser during Microsoft Teams, Zoom, or Google Meet screen share—no local Power BI installation required for teammates or stakeholders.
+* **Interactive Slicers**: Click between **2025**, **2026**, and **2027** or filter by **Category** (Technology, Furniture, Office Supplies) and **Region** (East, West, North, South) to showcase dynamic cross-filtering.
+* **Real-Time Data Streaming Demo**: Click the **Refresh** button or observe the automated 15-second countdown ticker simulating streaming transactional data.
+* **Power BI Service Integration**: In Power BI Desktop, click **Publish** to send the report to `app.powerbi.com`, where you can pin it to Microsoft Teams channels or embed it into PowerPoint slides via the Power BI add-in.
 
 ---
 
@@ -163,3 +176,4 @@ All calculations are documented in [`measures.dax`](./measures.dax):
 
 ## 📜 License & Acknowledgements
 Created for Power BI Desktop learners, data analysts, and BI enthusiasts. Sample data generated using Python. Free to use for study, training, and portfolio projects.
+
